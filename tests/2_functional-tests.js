@@ -169,7 +169,11 @@ suite('Functional Tests', function () {
               res.body,
               'Response body should contain a Book object',
             );
-            assert.deepEqual(res.body, expectedResponse);
+            assert.deepEqual(
+              res.body,
+              expectedResponse,
+              'Returned Book should have expected fields and values',
+            );
             done();
           })
           .catch((err) => done(err));
@@ -180,15 +184,91 @@ suite('Functional Tests', function () {
       'POST /api/books/[id] => add comment/expect book object with id',
       function () {
         test('Test POST /api/books/[id] with comment', function (done) {
-          //done();
+          const _id = insertedBookID;
+          const title = 'Test Book 1';
+          const comment = 'Test Comment!';
+          const expectedResult = { _id, title, comments: [comment] };
+          chai
+            .request(server)
+            .post(`/api/books/${_id}`)
+            .send({ comment })
+            .then((res) => {
+              assert.equal(res.status, 200, 'Response should have 200 status');
+              assert.equal(
+                res.type,
+                'application/json',
+                'Response type should be application/json',
+              );
+              assert.isObject(
+                res.body,
+                'Response body should contain a Book object',
+              );
+              assert.deepEqual(
+                res.body,
+                expectedResult,
+                'Returned Book should have expected fields and values, with new Comment added',
+              );
+              done();
+            })
+            .catch((err) => done(err));
         });
 
         test('Test POST /api/books/[id] without comment field', function (done) {
-          //done();
+          const _id = insertedBookID;
+
+          const expectedResult = 'missing required field comment';
+          chai
+            .request(server)
+            .post(`/api/books/${_id}`)
+            .send({})
+            .then((res) => {
+              assert.equal(res.status, 400, 'Response should have 400 status');
+              assert.equal(
+                res.type,
+                'application/json',
+                'Response type should be application/json',
+              );
+              assert.isString(
+                res.body,
+                'Response body should be an error string',
+              );
+              assert.equal(
+                res.body,
+                expectedResult,
+                'Returned Result should be "missing required field comment" error message',
+              );
+              done();
+            })
+            .catch((err) => done(err));
         });
 
         test('Test POST /api/books/[id] with comment, id not in db', function (done) {
-          //done();
+          const _id = 123; // Non-existent book _id
+          const expectedResult = 'no book exists';
+
+          chai
+            .request(server)
+            .post(`/api/books/${_id}`)
+            .send({})
+            .then((res) => {
+              assert.equal(res.status, 400, 'Response should have 400 status');
+              assert.equal(
+                res.type,
+                'application/json',
+                'Response type should be application/json',
+              );
+              assert.isString(
+                res.body,
+                'Response body should be an error string',
+              );
+              assert.equal(
+                res.body,
+                expectedResult,
+                'Returned Result should be "no book exists" error message',
+              );
+              done();
+            })
+            .catch((err) => done(err));
         });
       },
     );

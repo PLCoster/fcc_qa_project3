@@ -81,4 +81,25 @@ bookController.getBookByID = async (req, res, next) => {
   }
 };
 
+// Increments the count of comments for a book
+// Requires bookController.getBookByID middleware to have been called first
+bookController.incrementBookCommentCountByID = async (req, res, next) => {
+  const { _id } = res.locals.book;
+
+  try {
+    const updateInfo = await bookCollection.updateOne(
+      { _id },
+      { $inc: { commentcount: 1 } },
+    );
+
+    if (!updateInfo.modifiedCount === 1) {
+      throw new Error();
+    }
+
+    return next();
+  } catch (err) {
+    return res.status(400).json('unable to update book comments');
+  }
+};
+
 module.exports = bookController;

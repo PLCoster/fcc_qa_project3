@@ -12,9 +12,13 @@ const {
   getAllBooks,
   createBook,
   getBookByID,
+  incrementBookCommentCountByID,
 } = require('../controllers/bookController.js');
 
-const { getCommentsByBookID } = require('../controllers/commentController');
+const {
+  getCommentsByBookID,
+  createCommentByBookID,
+} = require('../controllers/commentController');
 
 module.exports = function (app) {
   app
@@ -49,7 +53,6 @@ module.exports = function (app) {
     .get(getBookByID, getCommentsByBookID, (req, res) => {
       // Return found book with attached array of comment strings
       const { _id, title } = res.locals.book;
-      console.log('RETURNING BOOK DETAILS BY ID');
       return res.json({
         _id,
         title,
@@ -59,11 +62,23 @@ module.exports = function (app) {
       });
     })
 
-    .post(function (req, res) {
-      let bookid = req.params.id;
-      let comment = req.body.comment;
-      //json res format same as .get
-    })
+    // POST request to /api/books/:id with a comment body adds a comment to the book
+    .post(
+      getBookByID,
+      getCommentsByBookID,
+      createCommentByBookID,
+      incrementBookCommentCountByID,
+      (req, res) => {
+        const { _id, title } = res.locals.book;
+        return res.json({
+          _id,
+          title,
+          comments: res.locals.bookComments.map(
+            (commentDoc) => commentDoc.comment,
+          ),
+        });
+      },
+    )
 
     .delete(function (req, res) {
       let bookid = req.params.id;
