@@ -12,9 +12,10 @@ const dbClient = new MongoClient(MONGO_URI);
 dbClient
   .connect()
   .then(() => console.log('Connected to Database'))
-  .catch((err) =>
-    console.error('Error when trying to connect to Database: ', err),
-  );
+  .catch((err) => {
+    console.error('Error when trying to connect to Database: ', err);
+    throw new Error('Database connection failed');
+  });
 
 const bookCollection = dbClient.db(DB_NAME).collection('issues');
 
@@ -36,9 +37,53 @@ bookController.getAllBooks = async (req, res, next) => {
     return next();
   } catch (err) {
     console.error(
-      'Error in bookController.getAll Books when trying to get all books: ',
+      'Error in bookController.getAllBooks when trying to get all books: ',
       err,
     );
+    return next(err);
+  }
+};
+
+// Creates a new Book, given a 'title' string field in body
+//
+bookController.createBook = async (req, res, next) => {
+  const { title } = req.body;
+
+  if (!title || typeof title !== 'string') {
+    return res.status(400).json('missing required field title');
+    // .json({ error: `Book title must be non-empty string, given: ${title}` });
+  }
+
+  // Otherwise create the book:
+  try {
+    const expireXSecondsFrom = new Date();
+    const newBookInfo = await bookCollection.insertOne({
+      title,
+      expireXSecondsFrom,
+      commentcount: 0,
+    });
+
+    if (!newBookInfo.acknowledged) {
+      throw new error('New Book Creation not acknowledged');
+    }
+
+    // Get new book document to return (only _id, title and commentcount fields)
+    const newBook = await bookCollection.findOne(
+      {
+        _id: newBookInfo.insertedId,
+      },
+      { title: 1, commentcount: 1 },
+    );
+
+    res.locals.newBook = newBook;
+
+    return next();
+  } catch (err) {
+    console.error(
+      'Error in bookController.createBook when trying to create a book: ',
+      err,
+    );
+
     return next(err);
   }
 };

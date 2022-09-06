@@ -8,7 +8,7 @@
 
 'use strict';
 
-const { getAllBooks } = require('../controllers/bookController.js');
+const { getAllBooks, createBook } = require('../controllers/bookController.js');
 
 module.exports = function (app) {
   app
@@ -19,8 +19,9 @@ module.exports = function (app) {
       return res.json(res.locals.allBooks);
     })
 
-    .post(function (req, res) {
-      let title = req.body.title;
+    // POST request to /api/books creates a new Book document
+    .post(createBook, (req, res) => {
+      return res.json(res.locals.newBook);
       //response will contain new book object including atleast _id and title
     })
 
