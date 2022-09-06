@@ -8,7 +8,13 @@
 
 'use strict';
 
-const { getAllBooks, createBook } = require('../controllers/bookController.js');
+const {
+  getAllBooks,
+  createBook,
+  getBookByID,
+} = require('../controllers/bookController.js');
+
+const { getCommentsByBookID } = require('../controllers/commentController');
 
 module.exports = function (app) {
   app
@@ -16,13 +22,19 @@ module.exports = function (app) {
 
     // GET request to /api/books returns JSON array of all Books
     .get(getAllBooks, (req, res) => {
-      return res.json(res.locals.allBooks);
+      return res.json(
+        res.locals.allBooks.map(({ _id, title, commentcount }) => ({
+          _id,
+          title,
+          commentcount,
+        })),
+      );
     })
 
     // POST request to /api/books creates a new Book document
     .post(createBook, (req, res) => {
-      return res.json(res.locals.newBook);
-      //response will contain new book object including atleast _id and title
+      const { _id, title, commentcount } = res.locals.newBook;
+      return res.json({ _id, title, commentcount });
     })
 
     .delete(function (req, res) {
@@ -30,10 +42,21 @@ module.exports = function (app) {
     });
 
   app
-    .route('/api/books/:id')
-    .get(function (req, res) {
-      let bookid = req.params.id;
-      //json res format: {"_id": bookid, "title": book_title, "comments": [comment,comment,...]}
+    // Route for interacting with a single Book by its _id
+    .route('/api/books/:_id')
+
+    // GET request to /api/books/:id returns the book and all its comments
+    .get(getBookByID, getCommentsByBookID, (req, res) => {
+      // Return found book with attached array of comment strings
+      const { _id, title } = res.locals.book;
+      console.log('RETURNING BOOK DETAILS BY ID');
+      return res.json({
+        _id,
+        title,
+        comments: res.locals.bookComments.map(
+          (commentDoc) => commentDoc.comment,
+        ),
+      });
     })
 
     .post(function (req, res) {
