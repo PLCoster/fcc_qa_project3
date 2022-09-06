@@ -1,30 +1,6 @@
-const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 
-const MONGO_URI = process.env.MONGO_URI;
-const DB_NAME =
-  process.env.NODE_ENV === 'test'
-    ? process.env.TEST_DB_NAME
-    : process.env.DB_NAME;
-
-const dbClient = new MongoClient(MONGO_URI);
-
-// Ensure connection to DB works:
-dbClient
-  .connect()
-  .then(() => console.log('Connected to Database'))
-  .catch((err) => {
-    console.error('Error when trying to connect to Database: ', err);
-    throw new Error('Database connection failed');
-  });
-
-const bookCollection = dbClient.db(DB_NAME).collection('issues');
-
-// Create TTL index to expire Book documents after X seconds
-// https://www.mongodb.com/docs/manual/tutorial/expire-data/
-bookCollection.createIndex(
-  { expireXSecondsFrom: 1 },
-  { expireAfterSeconds: 86400 }, // Expire records after 1 day
-);
+const { bookCollection } = require('../dbConnection');
 
 const bookController = {};
 
@@ -45,7 +21,7 @@ bookController.getAllBooks = async (req, res, next) => {
 };
 
 // Creates a new Book, given a 'title' string field in body
-//
+// Created book is stored at res.locals.newBook if successful
 bookController.createBook = async (req, res, next) => {
   const { title } = req.body;
 
@@ -68,12 +44,9 @@ bookController.createBook = async (req, res, next) => {
     }
 
     // Get new book document to return (only _id, title and commentcount fields)
-    const newBook = await bookCollection.findOne(
-      {
-        _id: newBookInfo.insertedId,
-      },
-      { title: 1, commentcount: 1 },
-    );
+    const newBook = await bookCollection.findOne({
+      _id: newBookInfo.insertedId,
+    });
 
     res.locals.newBook = newBook;
 
@@ -85,6 +58,26 @@ bookController.createBook = async (req, res, next) => {
     );
 
     return next(err);
+  }
+};
+
+// Gets a single Book by its _id field
+// Found Book document is stored at res.locals.book
+// If the Book does not exist, returns response with error message
+bookController.getBookByID = async (req, res, next) => {
+  const idString = req.params._id;
+
+  try {
+    const _id = ObjectId(idString); // This will error on bad idString - should be 24 hex chars
+    const book = await bookCollection.findOne(
+      { _id },
+      // { projection: { title: 1 } },
+    );
+
+    res.locals.book = book;
+    return next();
+  } catch (err) {
+    return res.status(400).json('no book exists');
   }
 };
 
