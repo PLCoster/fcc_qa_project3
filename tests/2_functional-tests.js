@@ -275,11 +275,57 @@ suite('Functional Tests', function () {
 
     suite('DELETE /api/books/[id] => delete book object id', function () {
       test('Test DELETE /api/books/[id] with valid id in db', function (done) {
-        //done();
+        const _id = insertedBookID;
+
+        const expectedResult = 'delete successful';
+        chai
+          .request(server)
+          .delete(`/api/books/${_id}`)
+          .then((res) => {
+            assert.equal(res.status, 200, 'Response should have 200 status');
+            assert.equal(
+              res.type,
+              'application/json',
+              'Response type should be application/json',
+            );
+            assert.isString(
+              res.body,
+              'Response body should be a success string',
+            );
+            assert.equal(
+              res.body,
+              expectedResult,
+              'Returned Result should be "delete successful" message',
+            );
+            done();
+          })
+          .catch((err) => done(err));
       });
 
       test('Test DELETE /api/books/[id] with  id not in db', function (done) {
-        //done();
+        const _id = 123; // Invalid id
+
+        const expectedResult = 'no book exists';
+
+        chai
+          .request(server)
+          .delete(`/api/books/${_id}`)
+          .then((res) => {
+            assert.equal(res.status, 400, 'Response should have 400 status');
+            assert.equal(
+              res.type,
+              'application/json',
+              'Response type should be application/json',
+            );
+            assert.isString(res.body, 'Response body should be a error string');
+            assert.equal(
+              res.body,
+              expectedResult,
+              'Returned Result should be "no book exists" message',
+            );
+            done();
+          })
+          .catch((err) => done(err));
       });
     });
   });

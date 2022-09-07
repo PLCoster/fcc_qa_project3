@@ -13,11 +13,13 @@ const {
   createBook,
   getBookByID,
   incrementBookCommentCountByID,
+  deleteBookByID,
 } = require('../controllers/bookController.js');
 
 const {
   getCommentsByBookID,
   createCommentByBookID,
+  deleteAllCommentsByBookID,
 } = require('../controllers/commentController');
 
 module.exports = function (app) {
@@ -49,7 +51,7 @@ module.exports = function (app) {
     // Route for interacting with a single Book by its _id
     .route('/api/books/:_id')
 
-    // GET request to /api/books/:id returns the book and all its comments
+    // GET request to /api/books/:_id returns the book and all its comments
     .get(getBookByID, getCommentsByBookID, (req, res) => {
       // Return found book with attached array of comment strings
       const { _id, title } = res.locals.book;
@@ -62,7 +64,7 @@ module.exports = function (app) {
       });
     })
 
-    // POST request to /api/books/:id with a comment body adds a comment to the book
+    // POST request to /api/books/:_id with a comment body adds a comment to the book
     .post(
       getBookByID,
       getCommentsByBookID,
@@ -79,9 +81,8 @@ module.exports = function (app) {
         });
       },
     )
-
-    .delete(function (req, res) {
-      let bookid = req.params.id;
-      //if successful response will be 'delete successful'
+    // DELETE request to /api/books/:_id deletes the Book by its _id
+    .delete(deleteBookByID, deleteAllCommentsByBookID, (req, res) => {
+      return res.json('delete successful');
     });
 };

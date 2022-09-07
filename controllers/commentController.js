@@ -2,6 +2,9 @@ const { commentCollection } = require('../dbConnection');
 
 const commentController = {};
 
+// Gets all the comments for a single Book by its _id
+// Requires bookController.getBookByID to be called first
+// Adds array of comments to res.locals.bookComments
 commentController.getCommentsByBookID = async (req, res, next) => {
   const book_id = res.locals.book._id;
 
@@ -50,12 +53,47 @@ commentController.createCommentByBookID = async (req, res, next) => {
   try {
     const commentInfo = await commentCollection.insertOne({ book_id, comment });
 
-    res.locals.bookComments.push({ comment });
+    if (!commentInfo.acknowledged) {
+      throw new Error('Comment creation not acknowledged by DB');
+    }
+
+    // Add new comment to array of book comments
+    res.locals.bookComments.push({
+      _id: commentInfo.insertedId,
+      book_id,
+      comment,
+    });
+
     return next();
   } catch (err) {
     return next(
       `Error in commentController.createCommentByBookID when trying to create a comment: ${err}`,
     );
+  }
+};
+
+// Deletes all comments for a given Book by its _id
+// Requires bookController.deleteBookByID to have been called first
+commentController.deleteAllCommentsByBookID = async (req, res, next) => {
+  const book_id = res.locals.deletedID;
+
+  // If no book_id, something has gone wrong
+  if (!book_id) {
+    return next(
+      'Error in commentController.deleteAllCommentsByBookID: No book_id on res.locals',
+    );
+  }
+
+  try {
+    const commentDeletionInfo = await commentCollection.deleteMany({ book_id });
+
+    if (!commentDeletionInfo.acknowledged) {
+      throw new Error('Comment deletion was not acknowledged by Database');
+    }
+
+    return next();
+  } catch (err) {
+    return next(`Error in commentController.deleteAllCommentsByBookID: ${err}`);
   }
 };
 

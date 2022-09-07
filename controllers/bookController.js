@@ -74,6 +74,11 @@ bookController.getBookByID = async (req, res, next) => {
       // { projection: { title: 1 } },
     );
 
+    // If no book found, return error message
+    if (!book) {
+      throw new Error();
+    }
+
     res.locals.book = book;
     return next();
   } catch (err) {
@@ -99,6 +104,29 @@ bookController.incrementBookCommentCountByID = async (req, res, next) => {
     return next();
   } catch (err) {
     return res.status(400).json('unable to update book comments');
+  }
+};
+
+// Deletes a single Book by its _id
+// Should be called alongside commentController.deleteAllCommentsByBookID to remove associated comments
+// Adds _id of deleted book to res.locals.deletedID
+bookController.deleteBookByID = async (req, res, next) => {
+  const idString = req.params._id;
+  console.log('TRYING TO DELETE BY ID');
+  try {
+    const _id = ObjectId(idString);
+
+    const deleteInfo = await bookCollection.deleteOne({ _id });
+
+    if (deleteInfo.deletedCount !== 1) {
+      // No book was deleted - book does not exist
+      throw new Error();
+    }
+
+    res.locals.deletedID = _id;
+    next();
+  } catch (err) {
+    return res.status(400).json('no book exists');
   }
 };
 
