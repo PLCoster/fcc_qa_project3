@@ -12,11 +12,9 @@ bookController.getAllBooks = async (req, res, next) => {
     res.locals.allBooks = allBooks;
     return next();
   } catch (err) {
-    console.error(
-      'Error in bookController.getAllBooks when trying to get all books: ',
-      err,
+    return next(
+      `Error in bookController.getAllBooks when trying to get all books: ${err}`,
     );
-    return next(err);
   }
 };
 
@@ -52,12 +50,9 @@ bookController.createBook = async (req, res, next) => {
 
     return next();
   } catch (err) {
-    console.error(
-      'Error in bookController.createBook when trying to create a book: ',
-      err,
+    return next(
+      `Error in bookController.createBook when trying to create a book: ${err}`,
     );
-
-    return next(err);
   }
 };
 
@@ -112,7 +107,7 @@ bookController.incrementBookCommentCountByID = async (req, res, next) => {
 // Adds _id of deleted book to res.locals.deletedID
 bookController.deleteBookByID = async (req, res, next) => {
   const idString = req.params._id;
-  console.log('TRYING TO DELETE BY ID');
+
   try {
     const _id = ObjectId(idString);
 
@@ -127,6 +122,24 @@ bookController.deleteBookByID = async (req, res, next) => {
     next();
   } catch (err) {
     return res.status(400).json('no book exists');
+  }
+};
+
+// Deletes all Books
+// Should be called alongside commentController.deleteAllComments
+bookController.deleteAllBooks = async (req, res, next) => {
+  try {
+    const deleteInfo = await bookCollection.deleteMany({});
+
+    if (!deleteInfo.acknowledged) {
+      throw new Error('Failed to delete all books');
+    }
+
+    return next();
+  } catch (err) {
+    return next(
+      `Error in bookController.deleteAllBooks when trying to create a book: ${err}`,
+    );
   }
 };
 

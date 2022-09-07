@@ -328,5 +328,31 @@ suite('Functional Tests', function () {
           .catch((err) => done(err));
       });
     });
+
+    suite('DELETE /api/books => delete all books', function () {
+      test('Test DELETE /api/books', function (done) {
+        const expectedResponse = 'complete delete successful';
+
+        chai
+          .request(server)
+          .delete('/api/books')
+          .then((res) => {
+            assert.equal(res.status, 200, 'Response status should be 200');
+            assert.equal(
+              res.type,
+              'application/json',
+              'Response type should be application/json',
+            );
+            assert.isString(res.body, 'Response body should be success string');
+            assert.equal(
+              res.body,
+              expectedResponse,
+              'Returned Result should be "complete delete successful" message',
+            );
+            done();
+          })
+          .catch((err) => done(err));
+      });
+    });
   });
 });

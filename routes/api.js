@@ -14,12 +14,14 @@ const {
   getBookByID,
   incrementBookCommentCountByID,
   deleteBookByID,
+  deleteAllBooks,
 } = require('../controllers/bookController.js');
 
 const {
   getCommentsByBookID,
   createCommentByBookID,
   deleteAllCommentsByBookID,
+  deleteAllComments,
 } = require('../controllers/commentController');
 
 module.exports = function (app) {
@@ -43,8 +45,9 @@ module.exports = function (app) {
       return res.json({ _id, title, commentcount });
     })
 
-    .delete(function (req, res) {
-      //if successful response will be 'complete delete successful'
+    // DELETE request to /api/books deletes all books in the database
+    .delete(deleteAllBooks, deleteAllComments, (req, res) => {
+      return res.json('complete delete successful');
     });
 
   app
@@ -81,6 +84,7 @@ module.exports = function (app) {
         });
       },
     )
+
     // DELETE request to /api/books/:_id deletes the Book by its _id
     .delete(deleteBookByID, deleteAllCommentsByBookID, (req, res) => {
       return res.json('delete successful');

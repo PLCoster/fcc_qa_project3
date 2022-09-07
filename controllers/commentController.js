@@ -97,4 +97,19 @@ commentController.deleteAllCommentsByBookID = async (req, res, next) => {
   }
 };
 
+// Deletes all Comments for all Books
+commentController.deleteAllComments = async (req, res, next) => {
+  try {
+    const deleteInfo = await commentCollection.deleteMany({});
+
+    if (!deleteInfo.acknowledged) {
+      throw new Error('Failed to delete all comments');
+    }
+
+    return next();
+  } catch (err) {
+    return next(`Error in commentController.deleteAllComments" ${err}`);
+  }
+};
+
 module.exports = commentController;
