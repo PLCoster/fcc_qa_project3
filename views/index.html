@@ -1,70 +1,329 @@
 <html>
-<head>
-  <title>Personal Library</title>
-  <link rel="icon" type="image/png" href="https://cdn.freecodecamp.org/universal/favicons/favicon-16x16.png" />
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/public/style.css">
-  <style>
-    code {
-      background-color: whitesmoke;
-    }
-  </style>
-</head>
-<body>
-<header>
-  <h1>Personal Library</h1>
-</header>
-<br>
-<div id ='sampleposting'>
-  <h2 style="text-align: left">Test API responses</h2>
-  <form action="/api/books" method="post" class="border">
-    <h4>Test post to /api/books</h4>
-    <label for="title" >Book Title</label>
-    <input type="text" id="title" name="title" value=""><br>
-    <input type="submit" value="Submit">
-  </form>
-  <form action="" method="post" id="commentTest" class="border">
-    <h4>Test post to /api/books/{bookid}</h4>
-    <label for="idinputtest">BookId to comment on</label>
-    <input type="text" name="id" value="" id="idinputtest"><br>
-    <label for="comment">Comment</label>
-    <input type="text" id="comment" name="comment" value=""><br>
-    <input type="submit" value="Submit">
-  </form>
-</div>
-<hr style='margin: 50px'>
-<div id='sampleui'>
-  <h2 style="text-align: left">Sample Front-End</h2>
-  <form id="newBookForm" class="border">
-    <label for="bookTitleToAdd">New Book Title</label>
-    <input type="text" id="bookTitleToAdd" name="title" placeholder="Moby Dick" style="width: 295px">
-    <button type="submit" value="Submit" id="newBook">Submit New Book!</button>
-  </form>
-  <div id='display'></div>
-  <div id='bookDetail' class='border'>
-    <p id='detailTitle'>Select a book to see it's details and comments</p>
-    <ol id='detailComments'></ol>
-  </div>
-  <button id='deleteAllBooks'>Delete all books...</button>
-</div>
-<hr style='margin: 50px'>
+  <head>
+    <title>Personal Library</title>
+    <meta
+      name="description"
+      content="An example of the Free Code Camp Personal Library Project"
+    />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<script src="https://code.jquery.com/jquery-2.2.1.min.js"
-        integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
-        crossorigin="anonymous"></script>
-<script src="/public/client.js"></script>
-<script>
-  /*
-  *  For #sampleposting to update form action url to test inputs book id
-  */
-  $(function() {
-    $('#commentTest').submit(function(){
-      let  id = $('#idinputtest').val();
-      $(this).attr('action', "/api/books/" + id);
-    });
-  });
-</script>
-</body>
+    <!-- FAVICONS -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/public/favicons/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/public/favicons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/public/favicons/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/public/site.webmanifest" />
+
+    <!-- STYLES -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.15.4/css/all.css"
+      integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="/public/style.css" />
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href=".">Issue Tracker</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavDropdown"
+          aria-controls="navbarNavDropdown"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                href="https://plcoster.github.io/homepage/"
+              >
+                Home
+              </a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdownMenuLink"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                FreeCodeCamp QA Projects
+              </a>
+              <ul
+                class="dropdown-menu"
+                aria-labelledby="navbarDropdownMenuLink"
+              >
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://fcc-qa-project1.plcoster.repl.co"
+                  >
+                    Metric - Imperial Converter
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://fcc-qa-project2.plcoster.repl.co"
+                  >
+                    Issue Tracker
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://fcc-qa-project3.plcoster.repl.co"
+                  >
+                    Personal Library
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://fcc-qa-project4.plcoster.repl.co"
+                  >
+                    Sudoku Solver
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://fcc-qa-project5.plcoster.repl.co"
+                  >
+                    American British Translator
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="https://plcoster.github.io/homepage/projects.html"
+              >
+                All Projects
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://github.com/PLCoster">
+                <i class="fab fa-github"></i> Github
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://linkedin.com/in/plcoster">
+                <i class="fab fa-linkedin"></i>
+                LinkedIn
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <main>
+        <h1>
+          <img
+            class="logo"
+            src="/public/logo.png"
+            alt="White icon of a book on a square green background"
+          />Personal Library
+        </h1>
+        <hr />
+
+        <section
+          id="view"
+          class="d-flex flex-column justify-content-center align-items-center"
+        >
+          <!-- API / FRONT END SWITCH -->
+          <div id="view-selection">
+            <button id="api-view-btn" class="btn selected">API View</button>
+            <button id="fe-view-btn" class="btn">UI View</button>
+          </div>
+
+          <!-- TEST API -->
+          <section id="api-view">
+            <div class="d-flex flex-row justify-content-center flex-wrap">
+              <!-- CREATE A BOOK -->
+              <form action="/api/books" method="post" class="border">
+                <h4>Add a Book</h4>
+                <p><code>POST /api/books</code></p>
+                <input
+                  type="text"
+                  id="title"
+                  class="form-control form-control-sm"
+                  name="title"
+                  placeholder="Book Title"
+                  value=""
+                  required
+                />
+                <input
+                  type="submit"
+                  class="btn btn-success btn-sm"
+                  value="Add a Book"
+                />
+              </form>
+
+              <!-- ADD COMMENT TO EXISTING BOOK -->
+              <form action="" method="post" id="commentTest" class="border">
+                <h4>Add a Comment</h4>
+                <p><code>POST /api/books/&lt;BOOK _id&gt;</code></p>
+                <input
+                  type="text"
+                  name="id"
+                  value=""
+                  id="idinputtest"
+                  class="form-control form-control-sm"
+                  placeholder="Book _id"
+                  required
+                />
+                <input
+                  type="text"
+                  id="comment"
+                  class="form-control form-control-sm"
+                  name="comment"
+                  value=""
+                  placeholder="Comment"
+                  required
+                />
+                <input
+                  type="submit"
+                  class="btn btn-success btn-sm"
+                  value="Add Comment"
+                />
+              </form>
+            </div>
+          </section>
+
+          <!-- Example UI -->
+          <section id="fe-view">
+            <!-- FLASH MESSAGE -->
+            <div id="fe-alert" class="alert" role="alert">
+              <div
+                class="d-flex flex-row justify-content-between align-items-center"
+              >
+                <span id="fe-alert-msg">Test Message!!!</span>
+                <button
+                  id="fe-alert-dismiss"
+                  class="btn btn-sm"
+                  data-dismiss="alert"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">x</span>
+                </button>
+              </div>
+            </div>
+            <div class="d-flex flex-row align-items-start flex-wrap">
+              <section id="book-panel">
+                <!-- Add a Book Form -->
+                <form id="newBookForm" class="border">
+                  <h4>Add a Book</h4>
+                  <input
+                    type="text"
+                    id="bookTitleToAdd"
+                    class="form-control form-control-sm"
+                    name="title"
+                    placeholder="Book Title"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    class="btn btn-success btn-sm"
+                    value="Submit"
+                    id="newBook"
+                  >
+                    Add Book to Library
+                  </button>
+                </form>
+                <!-- Books Display -->
+                <div id="books-display">
+                  <h4>Your Books</h4>
+                  <div id="display"></div>
+                  <hr />
+                  <button id="deleteAllBooks" class="btn btn-danger">
+                    Delete all Books
+                  </button>
+                </div>
+              </section>
+
+              <div id="book-detail" class="flex-grow-1">
+                <h4 id="detail-title">
+                  Select a book to see it's details and comments
+                </h4>
+                <p id="detail-id"></p>
+                <div id="detail-comments"></div>
+                <div id="comment-control"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <hr />
+      </main>
+    </div>
+
+    <!-- Bootstrap Script -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- jquery -->
+    <script
+      src="https://code.jquery.com/jquery-2.2.1.min.js"
+      integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Custom JS -->
+    <script src="/public/client.js"></script>
+    <script>
+      /*
+       *  For #api-view to update form action url to test inputs book id
+       */
+      $(function () {
+        $('#commentTest').submit(function () {
+          let id = $('#idinputtest').val();
+          $(this).attr('action', '/api/books/' + id);
+        });
+      });
+    </script>
+  </body>
 </html>

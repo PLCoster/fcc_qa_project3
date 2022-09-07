@@ -1,34 +1,223 @@
-.border {
-  border-style: solid;
-  border-width: 1px;
-  margin: 10px;
+/****** Main Styling ******/
+
+* {
+  box-sizing: border-box;
 }
 
-#sampleui {
-  max-width: 450px;
-  margin-left: 5%;
-  height: 100%;
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  color: #222;
+  background-color: #fafafa;
+  line-height: 1.4em;
+  min-height: 100vh;
 }
 
-#sampleposting {
-  max-width: 450px;
-  text-align: center;
-  margin-left: 5%;
+main {
+  padding: 40px 0;
 }
 
-#userstories {
-  margin-left: 5%;
+main .logo {
+  max-height: 50px;
+  margin-right: 20px;
+}
+
+hr {
+  margin: 25px;
+}
+
+h3 {
+  margin-top: 30px;
+}
+
+h5 {
+  margin-top: 20px;
+}
+
+a {
+  color: #2574a9;
 }
 
 form {
+  margin: 0 10px 25px 10px;
+  padding: 15px;
+  color: #fff;
+  background-color: #333;
+  width: 250px;
+  height: 100%;
+  border-radius: 5px;
+}
+
+form h3 {
+  margin-top: 0;
+}
+
+input,
+select,
+textarea {
+  display: block;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+textarea {
+  height: 50px;
+}
+
+.btn-success {
+  width: 100%;
+  background-color: #25ae1b;
+  border: none;
+}
+
+code {
+  font-family: monospace;
+  font-size: 1em;
+  padding: 2px;
+  color: black;
+  background-color: #fff;
+  max-width: 100%;
+}
+
+code.block {
+  display: block;
+  margin-bottom: 20px;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+code ul.indent {
+  padding-left: 20px;
+  list-style-type: none;
+  margin-bottom: 0;
+}
+
+#result-section {
+  margin: 0 10px 25px 10px;
+  width: 250px;
+  max-width: 100%;
+}
+
+p.note {
+  text-align: center;
+}
+
+.footer {
+  margin-top: 40px;
+}
+
+/****** NavBar Styles ******/
+
+.navbar.navbar-dark {
+  background-color: #333;
+}
+
+.navbar .nav-link {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.navbar .nav-link:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+/****** View Switch Styles ******/
+#view {
+  overflow-x: auto;
+}
+
+#view-selection {
+  padding: 10px;
+}
+
+#view-selection button {
+  background-color: lightgrey;
+  margin: 10px;
+}
+
+#view-selection button:hover {
+  border: 1px solid black;
+}
+
+#view-selection button.selected {
+  color: white;
+  background-color: #25ae1b;
+}
+
+/****** UI View Styles ******/
+
+#fe-view {
+  width: 100%;
+  display: none;
+}
+
+#fe-alert {
+  display: none;
+  padding: 10px;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+#fe-alert-dismiss {
+  line-height: 10px;
   padding: 5px;
 }
 
-label {
-  display: block;
-  font-weight: bold;
+#book-panel {
+  margin-right: 20px;
+  width: 250px;
 }
 
-input {
-  margin-bottom: 5px;
+#book-panel form {
+  margin: 0;
+}
+
+#books-display {
+  padding: 15px;
+  margin-top: 20px;
+  background-color: lightgrey;
+  border-radius: 5px;
+}
+
+#display {
+  max-height: 200px;
+  white-space: nowrap;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+#display ul {
+  padding: 0;
+  list-style: none;
+}
+
+#display .bookItem {
+  padding: 5px;
+  width: 100%;
+  border-radius: 5px;
+}
+
+#display .bookItem:hover {
+  background-color: darkgrey;
+  cursor: pointer;
+}
+
+#display .bookItem.selected {
+  background-color: #3da7f5;
+  cursor: pointer;
+}
+
+#deleteAllBooks {
+  display: block;
+  margin: auto;
+}
+
+#book-detail {
+  padding: 10px;
+  flex-grow: 1;
+}
+
+#newCommentForm {
+  margin: 0;
+  width: 100%;
+  max-width: 400px;
 }

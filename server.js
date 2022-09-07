@@ -51,7 +51,7 @@ app.get('*', (req, res) => {
 
 // Internal Error Handler:
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error(err);
   res.status(500).send('Internal Server error: See Server Logs');
 });
 
