@@ -1,5 +1,30 @@
 // This script is loaded by index.html to handle form submission and updates on the UI View
 
+// Helper function to make any displayed results HTML-safe
+function replaceUnsafeChars(input) {
+  if (typeof input !== 'string') {
+    return input;
+  }
+
+  const charReplacements = {
+    '<': '&lt;',
+    '>': '&gt;',
+    '&': '&amp;',
+    '"': '&quot;',
+    "'": '&#39;',
+  };
+
+  return input
+    .split('')
+    .map((char) => {
+      if (char in charReplacements) {
+        return charReplacements[char];
+      }
+      return char;
+    })
+    .join('');
+}
+
 // Function that fetches all books and displays them in UI
 // If book_id is provided, that book is selected in display menu
 function getAllBooks(book_id) {
@@ -15,7 +40,11 @@ function getAllBooks(book_id) {
 
     $.each(data, function (i, book) {
       items.push(
-        `<li class="bookItem" data-id="${book._id}"><strong>${book.title}</strong> (${book.commentcount})</li>`,
+        `<li class="bookItem" data-id="${
+          book._id
+        }"><strong>${replaceUnsafeChars(book.title)}</strong> (${
+          book.commentcount
+        })</li>`,
       );
       return true;
     });
@@ -45,14 +74,16 @@ function getBookDetails() {
 
   // Get Book Details:
   $.getJSON(`/api/books/${book_id}`, function (data) {
-    $('#detail-title').html('<strong>' + data.title + '</strong>');
+    $('#detail-title').html(
+      '<strong>' + replaceUnsafeChars(data.title) + '</strong>',
+    );
     $('#detail-id').text(`(id: ${data._id})`);
 
     const comments = [];
 
     // Add comments to list
     $.each(data.comments, function (i, val) {
-      comments.push('<li>' + val + '</li>');
+      comments.push('<li>' + replaceUnsafeChars(val) + '</li>');
     });
 
     if (comments.length === 0) {
@@ -128,7 +159,10 @@ $(document).ready(function () {
       type: 'delete',
       success: function (data) {
         getAllBooks(book_id);
-        flashMessage(`Book <strong>${title}</strong> was deleted`, 'success');
+        flashMessage(
+          `Book <strong>${replaceUnsafeChars(title)}</strong> was deleted`,
+          'success',
+        );
         $('#detail-comments').html(
           '<p style="color: red;">' + 'This Book has been Deleted' + '</p>',
         );
@@ -136,7 +170,7 @@ $(document).ready(function () {
       },
       error: function (data) {
         flashMessage(
-          `Book could not be deleted: ${data.responseJSON}`,
+          `Book could not be deleted: ${replaceUnsafeChars(data.responseJSON)}`,
           'danger',
         );
       },
@@ -145,8 +179,6 @@ $(document).ready(function () {
 
   // Set up onclick effect to add a comment to a book
   $('#book-detail').on('click', 'button.addComment', function (e) {
-    e.preventDefault();
-
     // Ensure form is complete
     if (!$('#commentToAdd').val()) {
       document.querySelector('#newCommentForm').reportValidity();
@@ -163,13 +195,16 @@ $(document).ready(function () {
       dataType: 'json',
       data: postData,
       success: function (data) {
-        flashMessage(`Added Comment for ${data.title}`, 'success');
+        flashMessage(
+          `Added Comment for ${replaceUnsafeChars(data.title)}`,
+          'success',
+        );
         getAllBooks(book_id);
 
         // Update comments:
         const comments = [];
         $.each(data.comments, function (i, val) {
-          comments.push('<li>' + val + '</li>');
+          comments.push('<li>' + replaceUnsafeChars(val) + '</li>');
         });
 
         if (comments.length === 0) {
@@ -183,7 +218,9 @@ $(document).ready(function () {
       },
       error: function (data) {
         flashMessage(
-          `Comment could not be added: ${data.responseJSON}`,
+          `Comment could not be added: ${replaceUnsafeChars(
+            data.responseJSON,
+          )}`,
           'danger',
         );
       },
@@ -193,6 +230,8 @@ $(document).ready(function () {
   // On Click function to Create a New Book
   $('#newBook').click(function (e) {
     e.preventDefault();
+    // Get current book id if any to re-highlight it on book refresh:
+    const book_id = $('.addComment').attr('data-id');
 
     // Ensure form is complete
     if (!$('#bookTitleToAdd').val()) {
@@ -208,10 +247,12 @@ $(document).ready(function () {
       success: function (data) {
         $('#bookTitleToAdd').val('');
         flashMessage(
-          `New Book Title Added: <strong>${data.title}</strong>`,
+          `New Book Title Added: <strong>${replaceUnsafeChars(
+            data.title,
+          )}</strong>`,
           'success',
         );
-        getAllBooks();
+        getAllBooks(book_id);
       },
     });
   });
@@ -227,7 +268,7 @@ $(document).ready(function () {
         flashMessage(`All Books Deleted`, 'success');
         getAllBooks();
         $('#detail-comments').html(
-          '<p style="color: red;">' + 'This Book has been Deleted' + '</p>',
+          '<p style="color: red;">' + 'All Books Have Been Deleted' + '</p>',
         );
         $('#comment-control').html('');
       },
