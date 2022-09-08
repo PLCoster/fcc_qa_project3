@@ -179,6 +179,8 @@ $(document).ready(function () {
 
   // Set up onclick effect to add a comment to a book
   $('#book-detail').on('click', 'button.addComment', function (e) {
+    e.preventDefault();
+
     // Ensure form is complete
     if (!$('#commentToAdd').val()) {
       document.querySelector('#newCommentForm').reportValidity();
@@ -186,7 +188,6 @@ $(document).ready(function () {
     }
 
     const postData = $('#newCommentForm').serialize();
-    $('#commentToAdd').val('');
     const book_id = $(this).attr('data-id');
 
     $.ajax({
@@ -195,6 +196,8 @@ $(document).ready(function () {
       dataType: 'json',
       data: postData,
       success: function (data) {
+        $('#commentToAdd').val('');
+
         flashMessage(
           `Added Comment for ${replaceUnsafeChars(data.title)}`,
           'success',
