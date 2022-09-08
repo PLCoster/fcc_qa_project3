@@ -53,7 +53,7 @@
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container-fluid">
-        <a class="navbar-brand" href=".">Issue Tracker</a>
+        <a class="navbar-brand" href=".">Personal Library</a>
         <button
           class="navbar-toggler"
           type="button"
@@ -181,7 +181,7 @@
           <section id="api-view">
             <div class="d-flex flex-row justify-content-center flex-wrap">
               <!-- CREATE A BOOK -->
-              <form action="/api/books" method="post" class="border">
+              <form action="/api/books" method="post">
                 <h4>Add a Book</h4>
                 <p><code>POST /api/books</code></p>
                 <input
@@ -201,7 +201,7 @@
               </form>
 
               <!-- ADD COMMENT TO EXISTING BOOK -->
-              <form action="" method="post" id="commentTest" class="border">
+              <form action="" method="post" id="commentTest">
                 <h4>Add a Comment</h4>
                 <p><code>POST /api/books/&lt;BOOK _id&gt;</code></p>
                 <input
@@ -229,6 +229,136 @@
                 />
               </form>
             </div>
+
+            <hr />
+
+            <section>
+              <h3>Example Usage:</h3>
+
+              <h5>To Add a Book:</h5>
+              <ul class="usage-list">
+                <li>
+                  Submit the 'Add a Book' form above with the desired Book
+                  title.
+                </li>
+                <li>
+                  Alternatively, send a POST request to
+                  <code>/api/books</code> and a body consisting of a url encoded
+                  field of <code>title</code>.
+                </li>
+              </ul>
+
+              <h5>To Add a Comment to a Book:</h5>
+              <ul class="usage-list">
+                <li>
+                  Submit the 'Add a Comment' form above with the desired Book
+                  _id and comment.
+                </li>
+                <li>
+                  Alternatively, send a POST request to
+                  <code>/api/books/&lt;BOOK _id&gt;</code>where &lt;BOOK _id&gt;
+                  is the _id of the book to be deleted, and a url encoded field
+                  of <code>comment</code>.
+                </li>
+              </ul>
+
+              <h5>To View All Books:</h5>
+              <ul class="usage-list">
+                <li>Send a GET request to <code>/api/books</code></li>
+                <ul>
+                  <li>For example <a href="/api/books">/api/books</a></li>
+                </ul>
+              </ul>
+
+              <h5>To View A Books Comments:</h5>
+              <ul class="usage-list">
+                <li>
+                  Send a GET request to
+                  <code>/api/books/&lt;BOOK _id&gt;</code> where &lt;BOOK
+                  _id&gt; is the _id of the desired book.
+                </li>
+              </ul>
+
+              <h5>To Delete a Book:</h5>
+              <ul class="usage-list">
+                <li>
+                  Send a DELETE request to
+                  <code>/api/books/&lt;BOOK _id&gt;</code> where &lt;BOOK
+                  _id&gt; is the _id of the book to be deleted.
+                </li>
+              </ul>
+
+              <h5>To Delete All Books:</h5>
+              <ul class="usage-list">
+                <li>
+                  Send a DELETE request to
+                  <code>/api/books</code>.
+                </li>
+              </ul>
+
+              <h3>Example Output:</h3>
+              <p>On successfully creating a Book:</p>
+
+              <code class="block"
+                >{
+                <ul class="indent">
+                  <li>"_id": "63196b9c380f77a8fc7df663",</li>
+                  <li>"title": "Example Book",</li>
+                  <li>"commentcount": 0,</li>
+                </ul>
+                }</code
+              >
+
+              <p>
+                On successfully adding a comment to a book, or requesting the
+                comments for a Book:
+              </p>
+              <code class="block"
+                >{
+                <ul class="indent">
+                  <li>"_id": "63196b9c380f77a8fc7df663",</li>
+                  <li>"title": "Example Book",</li>
+                  <li>"comments": ["Example of a Comment"],</li>
+                </ul>
+                }</code
+              >
+
+              <p>On requesting all Books:</p>
+              <code class="block"
+                >[
+                <ul class="indent">
+                  {
+                  <ul class="indent">
+                    <li>"_id": "63196b9c380f77a8fc7df663",</li>
+                    <li>"title": "Example Book",</li>
+                    <li>"commentcount": 1,</li>
+                  </ul>
+                  },
+                </ul>
+                <ul class="indent">
+                  {
+                  <ul class="indent">
+                    <li>"_id": "63196c5e380f77a8fc7df665",</li>
+                    <li>"title": "Another Book",</li>
+                    <li>"commentcount": 0,</li>
+                  </ul>
+                  }
+                </ul>
+                ]</code
+              >
+
+              <p>On deleting a Book:</p>
+              <code class="block">'delete successful'</code>
+
+              <p>On deleting all Books:</p>
+              <code class="block">'complete delete successful'</code>
+
+              <p>
+                If an invalid input is sent for any of these operations, a 400
+                status code is sent along with a JSON string explaining the
+                error.
+              </p>
+            </section>
           </section>
 
           <!-- Example UI -->
@@ -249,7 +379,7 @@
                 </button>
               </div>
             </div>
-            <div class="d-flex flex-row align-items-start flex-wrap">
+            <div class="d-flex flex-row align-items-start">
               <section id="book-panel">
                 <!-- Add a Book Form -->
                 <form id="newBookForm" class="border">
@@ -283,10 +413,8 @@
               </section>
 
               <div id="book-detail" class="flex-grow-1">
-                <h4 id="detail-title">
-                  Select a book to see it's details and comments
-                </h4>
-                <p id="detail-id"></p>
+                <h4 id="detail-title"></h4>
+                <p id="detail-id">Select a book to see its details</p>
                 <div id="detail-comments"></div>
                 <div id="comment-control"></div>
               </div>
@@ -296,6 +424,13 @@
 
         <hr />
       </main>
+
+      <footer>
+        <p>
+          A project set by
+          <a href="https://www.freecodecamp.org/">freeCodeCamp</a>
+        </p>
+      </footer>
     </div>
 
     <!-- Bootstrap Script -->
@@ -319,8 +454,9 @@
        *  For #api-view to update form action url to test inputs book id
        */
       $(function () {
+        // Add a comment
         $('#commentTest').submit(function () {
-          let id = $('#idinputtest').val();
+          const id = $('#idinputtest').val();
           $(this).attr('action', '/api/books/' + id);
         });
       });

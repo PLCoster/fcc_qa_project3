@@ -1,7 +1,8 @@
-// This script is loaded by index.html to handle form submission and update
+// This script is loaded by index.html to handle form submission and updates on the UI View
 
 // Function that fetches all books and displays them in UI
-function getAllBooks() {
+// If book_id is provided, that book is selected in display menu
+function getAllBooks(book_id) {
   $.getJSON('/api/books', function (data) {
     const items = [];
 
@@ -14,7 +15,7 @@ function getAllBooks() {
 
     $.each(data, function (i, book) {
       items.push(
-        `<li class="bookItem" id="${book._id}"><strong>${book.title}</strong> (${book.commentcount})</li>`,
+        `<li class="bookItem" data-id="${book._id}"><strong>${book.title}</strong> (${book.commentcount})</li>`,
       );
       return true;
     });
@@ -23,12 +24,17 @@ function getAllBooks() {
       class: 'listWrapper',
       html: items.join(''),
     }).appendTo('#display');
+
+    // Highlight currently selected book
+    if (book_id) {
+      $(`.bookItem[data-id=${book_id}]`).addClass('selected');
+    }
   });
 }
 
 // Function that gets details of a specific book when selected
 function getBookDetails() {
-  const book_id = this.id;
+  const book_id = $(this).attr('data-id');
 
   // Highlight book as selected in book list
   document.querySelectorAll('.bookItem').forEach((bookItem) => {
@@ -63,10 +69,10 @@ function getBookDetails() {
       <br>
         <form id="newCommentForm">
           <input type="text" class="form-control form-control-sm" id="commentToAdd" name="comment" placeholder="New Comment" required>
-          <button class="btn btn-success btn-sm addComment" id="${book_id}">Add Comment</button>
+          <button class="btn btn-success btn-sm addComment" data-id="${book_id}">Add Comment</button>
         </form>
         <hr>
-        <button class="btn btn-danger deleteBook" id="${book_id}">Delete Book</button>
+        <button class="btn btn-danger deleteBook" data-id="${book_id}">Delete Book</button>
         `);
   });
 }
@@ -116,11 +122,12 @@ $(document).ready(function () {
   // Set up onclick effect to delete a single book
   $('#book-detail').on('click', 'button.deleteBook', function () {
     const title = $('#detail-title').text();
+    const book_id = $(this).attr('data-id');
     $.ajax({
-      url: '/api/books/' + this.id,
+      url: '/api/books/' + book_id,
       type: 'delete',
       success: function (data) {
-        getAllBooks();
+        getAllBooks(book_id);
         flashMessage(`Book <strong>${title}</strong> was deleted`, 'success');
         $('#detail-comments').html(
           '<p style="color: red;">' + 'This Book has been Deleted' + '</p>',
@@ -148,15 +155,16 @@ $(document).ready(function () {
 
     const postData = $('#newCommentForm').serialize();
     $('#commentToAdd').val('');
+    const book_id = $(this).attr('data-id');
 
     $.ajax({
-      url: '/api/books/' + this.id,
+      url: '/api/books/' + book_id,
       type: 'post',
       dataType: 'json',
       data: postData,
       success: function (data) {
         flashMessage(`Added Comment for ${data.title}`, 'success');
-        getAllBooks();
+        getAllBooks(book_id);
 
         // Update comments:
         const comments = [];
