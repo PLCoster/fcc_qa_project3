@@ -297,6 +297,31 @@ suite('Functional Tests', function () {
               expectedResult,
               'Returned Result should be "delete successful" message',
             );
+
+            // Ensure that book has been deleted:
+            return chai.request(server).get(`/api/books/${_id}`);
+          })
+          .then((getResponse) => {
+            const expectedResult = 'no book exists';
+            assert.equal(
+              getResponse.status,
+              400,
+              'Response should have 400 status',
+            );
+            assert.equal(
+              getResponse.type,
+              'application/json',
+              'Response type should be application/json',
+            );
+            assert.isString(
+              getResponse.body,
+              'Response body should be a success string',
+            );
+            assert.equal(
+              getResponse.body,
+              expectedResult,
+              'Returned Result should be "no book exists" message',
+            );
             done();
           })
           .catch((err) => done(err));
@@ -333,9 +358,18 @@ suite('Functional Tests', function () {
       test('Test DELETE /api/books', function (done) {
         const expectedResponse = 'complete delete successful';
 
-        chai
-          .request(server)
-          .delete('/api/books')
+        // First add some books
+        Promise.all(
+          Array(5).map((el, i) =>
+            chai
+              .request(server)
+              .post('/api/books')
+              .send({ title: `Test Book ${i}` }),
+          ),
+        )
+          .then(() => {
+            return chai.request(server).delete('/api/books');
+          })
           .then((res) => {
             assert.equal(res.status, 200, 'Response status should be 200');
             assert.equal(
@@ -348,6 +382,30 @@ suite('Functional Tests', function () {
               res.body,
               expectedResponse,
               'Returned Result should be "complete delete successful" message',
+            );
+
+            // Check books are deleted:
+            return chai.request(server).get('/api/books');
+          })
+          .then((getResponse) => {
+            assert.equal(
+              getResponse.status,
+              200,
+              'Response status should be 200',
+            );
+            assert.equal(
+              getResponse.type,
+              'application/json',
+              'Response type should be application/json',
+            );
+            assert.isArray(
+              getResponse.body,
+              'Response body should be an array',
+            );
+            assert.equal(
+              getResponse.body.length,
+              0,
+              'Response array should contain no bBoks after successful deletion of all Books',
             );
             done();
           })
