@@ -16,7 +16,9 @@ chai.use(chaiHttp);
 suite('Functional Tests', function () {
   // Wait 1s to ensure DB connected before running tests
   this.beforeAll((done) => {
-    setTimeout(() => done(), 1000);
+    setTimeout(() => {
+      done();
+    }, 1000);
   });
 
   suite('Routing tests', function () {
@@ -357,17 +359,19 @@ suite('Functional Tests', function () {
     suite('DELETE /api/books => delete all books', function () {
       test('Test DELETE /api/books', function (done) {
         const expectedResponse = 'complete delete successful';
-
         // First add some books
         Promise.all(
-          Array(5).map((el, i) =>
-            chai
-              .request(server)
-              .post('/api/books')
-              .send({ title: `Test Book ${i}` }),
-          ),
+          Array(5)
+            .fill(1)
+            .map((el, i) =>
+              chai
+                .request(server)
+                .post('/api/books')
+                .send({ title: `Test Book ${i + 1}` })
+                .then((res) => res.body),
+            ),
         )
-          .then(() => {
+          .then((res) => {
             return chai.request(server).delete('/api/books');
           })
           .then((res) => {
@@ -405,7 +409,7 @@ suite('Functional Tests', function () {
             assert.equal(
               getResponse.body.length,
               0,
-              'Response array should contain no bBoks after successful deletion of all Books',
+              'Response array should contain no Books after successful deletion of all Books',
             );
             done();
           })
